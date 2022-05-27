@@ -1,0 +1,20 @@
+
+#https://ubuntu.com/server/docs/cloud-images/amazon-ec2
+aws ssm get-parameters --names \
+     /aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id --query 'Parameters[*].[Value]' --output text
+
+aws ec2 create-key-pair \
+    --key-name my-key-pair \
+    --key-type rsa \
+    --query "KeyMaterial" \
+    --output text 1> my-key-pair.pem 2> /dev/null || echo "Key exisist"
+
+
+aws ec2 describe-vpcs --filters "Name=is-default,Values=true" --query Vpcs[].VpcId --output text
+
+aws ec2 create-security-group --group-name my-sg --description "My security group" --vpc-id vpc-0dabbe7ce5c98d079
+
+aws ec2 describe-security-groups \
+    --filters "Name=group-name,Values=ec2-sg" "Name=vpc-id,Values=vpc-0dabbe7ce5c98d079" \
+    --query "SecurityGroups[*].[GroupId]" \
+    --output text

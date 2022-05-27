@@ -1,0 +1,13 @@
+#!/bin/bash
+apt update -y
+apt upgrade -y
+
+apt install nginx -y
+systemctl start nginx
+systemctl enable nginx
+
+wget https://www.free-css.com/assets/files/free-css-templates/download/page278/faster.zip
+apt install unzip -y
+unzip $PWD/faster.zip
+rm -rf /var/www/html/*
+mv $PWD/logistics-company-website-template/* /var/www/html
