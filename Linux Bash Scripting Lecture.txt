@@ -1,0 +1,783 @@
+1) Adding user
+
+#add user and password
+useradd automation
+passwd automation
+
+# we need to create home folder manually for automation
+mkdir -p /home/automation
+
+# change ownership of /home/automation folder
+chown -R automation:automation /home/automation
+
+# adding automation into sudoers list
+sudo nano /etc/suoders
+
+#add line
+automation ALL=(ALL) ALL
+
+# switch user to automation
+
+su - automation 
+OR 
+su -l automation 
+OR
+su --login automation 
+
+# check which shell is assigned to automation
+echo $SHELL
+
+bash
+
+#check all available shells
+cat /etc/shells
+
+# change the shell permenantly
+chsh
+
+# check OS info
+
+cat /etc/os-release
+
+2) General Purpose Commands you must know
+pwd, whoami, id, clear, touch, ls, cd, date, sort, seq, 
+wc, bc, head, tails, cat, less, more, history, cp, mv, mkdir,
+rm, tar, zip, unzip, wget, curl, file, stat, ln, grep, awk, 
+sed, cut, last, paste, du, df, netstat, find, etc
+
+-------------------------------------------------------------
+
+3) Redirection Operators STDIN, STDOUT, STDERR
+
+# Linux take input from keyboard, output/error on screen
+# we may want to put output of command into file
+# or isse other command on the output of the one command
+
+# We have Output Redirection (>), Input Redirection (<), Combining Redirection (|)
+
+# Output Redirection (new)
+ls -ltr /etc/nginx > demo.txt
+
+# Output Redirection (append)
+ls -ltr /etc/nginx >> demo.txt
+
+# Input Redirection (<)
+cat < demo.txt
+
+# Combining Redirection (|)
+ls -ltr /etc/nginx | awk '{print $1}'
+ls -ltr /etc/nginx | grep conf.d
+ls -ltr /etc/nginx | awk '{print $1}' | grep d
+
+# while redirecting still shows a sucess message
+nginx -v > sample.txt
+
+# how to hide messages?
+# File Descripters (Integers to identify STDIN, STDOUT, STDERR)
+# 0:STDIN
+# 1:STDOUT
+# 2: STDERR
+
+command 1> file.txt   (redirect ONLY success output to file)
+command 2> file.txt   (redirect ONLY error output to file)
+
+ls -ltr /etc/nginx 1> demo.txt
+ls -ltr /etc/nginx 2> demo.txt
+ls -ltr /etc/ngix 2> demo.txt
+ls -ltr /etc/nginx 1>success.txt 2>error.txt
+
+# if redirection is to same file
+ls -ltr /etc/nginx 1>success.txt 2>success.txt
+
+# you can combine
+ls -ltr /etc/nginx 1>success.txt 2>&1
+OR
+ls -ltr /etc/nginx &>success.txt
+
+4) Commands to Read a file content
+# Read a file content by opening it
+# Read a file content without opening it
+# Read a file content with conditions
+
+# Read a file content by opening it
+nano /etc/ssh/sshd_config
+
+# Read a file content without opening it (cat, less, more)
+cat /etc/ssh/sshd_config
+cat -n /etc/ssh/sshd_config  (with line numbers)
+
+less /etc/ssh/sshd_conf (read line by line, press 'q' to stop)
+more /etc/ssh/sshd_conf (read line by line)
+
+# Read a file content with conditions (more, tail, grep, awk, sed)
+more /etc/ssh/sshd_conf
+more -5 /etc/ssh/sshd_conf (top 5 line first)
+more +25 /etc/ssh/sshd_conf (start displaying content from 25th line)
+
+head /etc/ssh/sshd_conf (by default it displays top 10)
+head -5 /etc/ssh/sshd_conf (displays top 5)
+
+tail /etc/ssh/sshd_conf (by default it displays last 10)
+tail -5 /etc/ssh/sshd_conf (displays last 5)
+
+#reading range of line
+
+#Displaying 6th to 12th line
+#First get top 12 lines, then bottom 6 lines)
+
+head -12 /etc/ssh/sshd_conf | tail -7
+
+## GREP command
+# It is a filter command that is used to search a string in a given file
+
+test.txt file
+-------------------------------------------------------------------
+THIS LINE IS THE 1ST UPPER CASE LINE IN THIS FILE.
+this line is the 1st lower case line in this file.
+This Line Has All Its First Character Of The Word With Upper Case.
+-------------------------------------------------------------------
+
+grep [options] "string/pattern" file/files
+basic options -i -w -v -o -n -c -A -B -C -f -e -E
+
+grep above test.txt
+grep lines test.txt
+grep gulraiz test.txt
+grep "lines" test.txt (It is good to use string within "")
+grep "line is" test.txt
+grep "string" file1.txt file2.txt ( You can search in two files)
+grep "string" * (search in all files in current location)
+
+echo "This is simple string" | grep "simple"
+cat test.txt | grep "above"
+
+-i (ignore case)
+cat test.txt | grep -i "Above"
+
+-w (match whole word)
+cat test.txt | grep "line"
+cat test.txt | grep -w "line"
+
+-v (match except the searching text)
+cat test.txt | grep -v "line"
+
+-o (matched part from matches lines)
+cat test.txt | grep "above" (prints entire line)
+cat test.txt | grep -o "above" (prints only matched word)
+
+-n (display matched line numbers)
+cat test.txt | grep -n "above"
+cat test.txt | grep -n -o "above"
+OR
+cat test.txt | grep -no "above"
+
+-c (matched number of lines)
+cat test.txt | grep -c "above"
+cat test.txt | grep -c "line"
+cat test.txt | grep -c "gulraiz"
+
+-A (N lines after match)
+cat test.txt | grep -A 1 "above" (print 1 line after match)
+
+-B (N lines before match)
+cat test.txt | grep -B 1 "above" (print 1 line before match)
+
+-C (N lines before & after match)
+cat test.txt | grep -C 1 "above" (print 1 line before and after match)
+
+-f (take search string/pattern from a file, one per line)
+echo "above" > search_string.txt
+cat test.txt | grep -f search_string.txt
+
+echo "line" >> search_string.txt
+cat test.txt | grep -f search_string.txt (search one per line)
+
+-e (multiple search string)
+cat test.txt | grep -e "line" -e "above"
+
+-E (pattern)
+cat test.txt | grep -E "line|above"
+cat test.txt | grep -E "^Th" (starting with Th)
+
+ xy|pq Matches for xy or pq
+ ^xyz Matches for the lines which are starting with “xyz”
+ xyz$ Matches for the lines which are ending with “xyz”
+ ^$ Matches for the lines which are empty
+ \ To remove the special purpose of any symbol. Ex: \^ \$
+ . Matches any one character
+ \. Matches exactly with .
+ \b Match the empty string at the edge of word
+ ? The preceding character is optional and will be matched, at most, once.
+ * The preceding character will be matched zero or more times
+ + The preceding character will be matched one or more times
+ [xyz] Matches for the lines which are having x or y or z
+ [a-d] is equal to [abcd] Matched for the lines which are having a/b/b/d
+ [a-ds-z] is eqal to [abcdstuvwxyz]
+ ^[abc] Matches for the lines which are starting with a/b/c
+ [^abc] Matches for the lines which are not starting with a/b/c
+ {N} The preceding string matched exactly N times
+ {N,} The preceding string matched N or more times
+ {N,M} The preceding string matched at least N times but not more than M times
+
+
+[[:alnum:]] – Alphanumeric characters.
+[[:alpha:]] – Alphabetic characters
+[[:blank:]] – Blank characters: space and tab.
+[[:digit:]] – Digits: ‘0 1 2 3 4 5 6 7 8 9’.
+[[:lower:]] – Lower-case letters: ‘a b c d e f g h i j k l m n o p q r s t u v w x y z’.
+[[:space:]] – Space characters: tab, newline, vertical tab, form feed, carriage return, and space.
+[[:upper:]] – Upper-case letters: ‘A B C D E F G H I J K L M N O P Q R S T U V W X Y Z’.
+
+---------------------------------------------------------------------------------------
+
+###CUT Command
+The 'cut ‘ command is a powerful tool to extract parts of each line from a file.
+based on *Character Position *Field based on delimeters
+
+(bytes and charaters are same)
+
+options: -c and -f
+-c (character)
+-f (field)
+
+Practice
+========
+cat /etc/passwd | cut -c 1 (first character)
+cat /etc/passwd | cut -c 4 (fourth character)
+cat /etc/passwd | cut -c 1,2 (1st and 2nd character)
+cat /etc/passwd | cut -c 1-5 (1st to 5th characters)
+cat /etc/passwd | cut -c 1-5,9 (1st to 5th characters and 9th)
+cat /etc/passwd | cut -c 1-5
+OR
+cat /etc/passwd | cut -c -5 (same as above if you dont mention starting range)
+cat /etc/passwd | cut -c 5- (5th to last character)
+
+test.txt (tab separated)
+--------
+one	two	three
+four	five	six
+seven	eight	nine
+
+* tab is default field separator/delimeter, need not to mention in command
+
+cat test.txt | cut -f 1 (print 1st field)
+cat test.txt | cut -f 3 (print 3rd field)
+cat test.txt | cut -f 1,2 (print 1st and 2nd field)
+
+cat /etc/passwd | cut -d ':' -f 1 (with delimiter : as field separator)
+cat /etc/passwd | cut -d ':' -f 1,2
+cat /etc/passwd | cut -d ':' -f 1,2 --output-delimiter=" " (print space as delimiter instead of :)
+
+-s (skip the lines that does not have delimeter)
+
+nginx -v &> nginx.txt
+cat nginx.txt | cut -d '/' -f 2 | cut -d ' ' -f 1 (to print version only)
+
+### AWK COMMAND
+The awk command is a powerful method for processing or analyzing text or data files ,
+which are organized by lines ( rows or records) and columns( fileds
+
+awk ' {action }' input file
+awk [options] '[selection criteria] {action }' input file
+Action: Action is a logic to perform action on each record.
+
+Some of the default variables for awk
+$0  Entire file
+$1  First field from each line/record
+$2  Second field from each line/record
+$NR  It will print line or record number
+$NF  It will print number of fields from each line/record
+
+Awk can take the following options:
+-F fs To specify a field separator . (Default separator is space)
+-f file To specify a file that contains awk script.
+-v var=value To declare a variable.
+
+Practice
+---------
+demo.txt
+
+col1 col2 col3 			(space)
+col1	col2	col3 			(tabs)
+
+cat demo.txt | awk '{print}' (print entire file)
+OR
+cat demo.txt | awk '{print $0}'
+cat demo.txt | awk '{print $1}'
+cat demo.txt | awk '{print $1,$2}'
+cat demo.txt | awk '{print $2,$1}' (Reversing position)
+
+cat demo.txt | awk '{print NR,$0}' (print line/record number)
+cat demo.txt | awk '{print $0,NF}'  (print number of fileds in a line/record)
+cat demo.txt | awk '{print $NF}     (print last field of each record)
+
+cat nginx.txt | awk '{print $3}' | awk -F '/' '{print $2}' 
+
+## tr command (translate)
+
+demo.txt
+Line 1
+Line 2
+Line 3
+Line 4
+Line 5
+
+tr '[:upper:]' '[:lower:]' < demot.txt (translate upper case to lower)
+tr 'a' 'A' < demo.txt (translate a to A at each occurence)
+tr ' ' '_' < demo.txt (Replace space with underscore at each occurence)
+tr -d "," < demo.txt (Delete commas at each occurence)
+tr [a-z] [A-Z]
+
+## tee command
+tee command is used to display the output and also to store that output into a file.
+
+ls -ltr > output.txt (save to file, but does not display the output)
+ls -ltr | tee output.txt (save to file, ALSO display the output
+ls -ltr | tee -a output.txt (append the content)
+
+uptime | tee -a logs.txt
+
+-------------------------------------------------------------------------------
+
+## BASH SCRIPTING INTRODUCTION
+
+#!/bin/bash (she-bang)
+
+* variables (system variables, user-defined variables)
+* system varibles are created and mainained by OS
+
+$BASH, $PWD, $USER, $UID, $HOME
+
+USER DEFINED
+------------------------------------
+#!/bin/bash
+
+FIRST_NAME="Gulraiz"
+LAST_NAME="Gulshan"
+DATE=$(date)
+DAY=$(date | awk '{print $1}')
+MONTH=$(date | awk '{print $2}')
+YEAR=$(date | awk '{print $3}')
+
+UPTIME=`uptime`
+
+echo "$FIRST_NAME $LAST_NAME"
+echo "$DATE"
+echo "$UPTIME"
+echo "$DAY"
+echo "$MONTH"
+echo "$YEAR"
+---------------------------------------
+
+## PRACTICE NGINX VERSION & NGINX STATUS
+----------------------------------------------
+#!/bin/bash
+STATUS= $(systemctl status nginx | awk '/Active/ {print $3}' | tr -d '('  | tr -d ')')
+OR
+STATUS=$(systemctl status nginx | awk '/Active/ {print $3}' | tr -d '[()]')    // using pattern
+
+echo "The NGINX is $STATUS on $(hostname -f)"
+
+--------------------------------
+
+## echo command with escape charater
+
+echo -e "Gulraiz\nGulshan"
+echo -e "Gulraiz\tGulshan"
+echo -e "This is \"bash\" script"
+
+## DISPLAY MESSAGE IN COLORS
+# Reset
+Color_Off='\033[0m'       # Text Reset
+
+# Regular Colors
+Black='\033[0;30m'        # Black
+Red='\033[0;31m'          # Red
+Green='\033[0;32m'        # Green
+Yellow='\033[0;33m'       # Yellow
+Blue='\033[0;34m'         # Blue
+Purple='\033[0;35m'       # Purple
+Cyan='\033[0;36m'         # Cyan
+White='\033[0;37m'        # White
+
+echo -e "\033[0;31m This is sample line \033[0m"
+
+---------------------------------------------------
+
+# HERE DOCUMENT for multiline block
+
+Syntanx:
+command << DELIMITER
+line 1
+line 2
+line 3
+DELIMITER
+
+delimeter can be any string
+
+--------------
+#!/bin/bash
+
+cat << EOF
+The use is: $USER
+The home directory for this $USER is: $HOME
+EOF
+------------------------------------------
+#!/bin/bash
+#copying to file not displying the result
+
+cat << EOF > file.txt
+The use is: $USER
+The home directory for this $USER is: $HOME
+EOF
+
+--------------
+
+#HERE STRING
+
+command <<< string
+
+echo "Hello this is sample line" | tr [a-z] [A-Z]
+equals to
+tr [a-z] [A-Z] <<< "Hello this is sample line" (here string)
+
+name="gulraiz"
+tr [a-z] [A-Z] <<< $name
+
+-------------------------------
+
+# COMMENTS
+
+Single Line
+------------
+
+#line1
+#line2
+#line3
+
+Multiple line
+-------------
+
+<< ANYSTRING
+line1
+line2
+line3
+ANYSTRING
+
+OR
+
+: '
+line1
+line2
+line3
+'
+
+-------------------------
+which env
+
+use
+#!/usr/bin/env bash
+
+instead of
+#!/bin/bash
+
+--------------------------
+
+# DEBUGGING BASH SHELL SCRIPT
+ set -n No Execution, Purely for syntax check.
+ set -x Prints the command before executing it in script
+ set -e Exit Script if any command fails
+
+-------------------
+#!/bin/bash
+
+#set -n
+#set -x
+#set -e
+
+pwd
+date
+shshshsj
+user=$(whoami)
+echo "This is about debugging a bash shell script"
+echo "The user is: $user"
+
+----------------------
+
+#### EXIT COMMAND STATUS
+
+echo $?
+
+0 => Command is success
+1 => Valid Command but execution was failed
+127 => Invalid Command
+
+ls
+echo $?
+
+nginx -v 
+echo $?
+
+docker -v
+echo $?
+
+----------------------------------
+
+### BASIC STRING OPERATION
+
+Defining String Variable
+x="string" (better to have quotation when assiging string to variable
+now=$(date)
+
+Displaying string variable
+echo "$x"
+echo "${x}"
+
+Finding lenght of string
+echo "${#x}"
+
+Concatenation
+x="string1"
+y="string2"
+result=$x$y
+echo $result
+
+Convert Strings into lower/upper case
+xU=${x^^}
+yL=${y,,}
+
+Replacing the part of the string using variable
+newY=${y/Shell/Bash Shell}
+
+Slicing the string/sub-string
+${variable_name:start_position:length}
+
+------------------------------------------------
+
+## STRING OPERATION ON PATH
+
+ realpath : Converts each filename argument to an absolute pathname but it do not validate the path.
+ basename: Strips directory information | suffixes from file names
+ dirname : It will delete any suffix beginning with the last slash character and return the result
+
+realpath demo.sh
+
+basename demo.sh (string directory info)
+basename demo.sh .sh (strips suffix)
+
+#to only get file name
+mypath=/home/automation/practice/sample.tar.gz
+basename $path .tar.gz
+
+dirname $mypath
+
+-----------------------------------------------
+## INPUT WITH COMMAND LINE ARGUEMENTS
+
+#!/bin/bash
+
+echo "${0}" #scriptname
+echo "${1}" #1st arg
+echo "${2}"
+echo "${3}"
+
+echo "$#" #number of arguements
+-----------------------
+
+## TEST COMMANDS
+
+test condition or [ condition ] or [[ condition ]]
+
+ Numbers:
+ [[ int1 -eq int2 ]] -- It return true if they are equal else false
+ [[ int1 -ne int2 ]] -- It return false if they are not equal else true
+ [[ int1 -lt int2 ]] -- It return true if int1 is less than int2 else false
+ [[ int1 –le int2 ]] -- It return true if int1 is less than or equal to int2 else false
+ [[ int1 -gt int2 ]] -- It return true if int1 is greater than int2 else false
+ [[ int1 -ge int2 ]] -- It return true if int1 is greater than or equal to int2 else false
+ [[ ! int1 -eq int2 ]] -- It reverse the result
+
+ Strings:
+ [[ -z str ]] -- It return true if the length of the str is zero else false
+ [[ -n str ]] -- It return true if the length of the str is no-zero else false
+ [[ str1 == str2 ]] -- It return true if both the strings are equal else false
+ [[ str1 != str2 ]] -- It return true if both the strings are equal else false
+
+File test Operators with test command
+ [[ -d file ]] -- It return true if the file/path is directory else false
+ [[ -f file ]] -- It return true if the file/path is a file else false
+ [[ -e file ]] -- It return true if the file/path is exists else false
+ [[ -r file ]] -- It return true if the file/path is readable else false
+ [[ -w file ]] -- It return true if the file/path is writable else false
+ [[ -x file ]] -- It return true if the file/path is executable else false
+
+
+[[ 2 -eq 2 ]]
+echo $?
+
+if 0 = succeess, 1 = failed
+
+-------------------------------------------------------------------
+
+## COMMAND CHAINING
+
+ cmd1 ; cmd2 – Run cmd1 and then cmd2, regardless of the success or failure of cmd1
+ cmd1 && cmd2 – Run cmd2 only if cmd1 succeeded
+ cmd1 || cmd2 – Run cmd2 only if cmd1 failed
+ cmd1 && cmd2 || cmd3 – Run cmd2 if cmd1 is success else run cmd3
+
+which nginx; which docker;
+ls;pwd
+
+which nginx && nginx -v
+which docker && docker -v
+which nginx &> /dev/null && nginx -v
+which docker &> /dev/null || echo "Docker is not installed"
+which nginx &> /dev/null && echo "NGINX is installed" || echo "NGINX is not installed"
+
+
+which nginx && { systemctl status nginx ; nginx -v }
+--------------------------------------------------------------------------------------
+
+## CONDITIONAL STATEMENTS
+
+Cmd1 && Cmd2
+--------------
+if Cmd1
+then
+ Cmd2
+fi
+
+Cmd1 && { Cmd2 ; Cmd3 ; }
+-------------------------
+if Cmd1
+then
+ Cmd2
+ Cmd3
+fi
+
+Cmd1 && Cmd2 || Cmd3
+--------------------
+if Cmd1
+then
+ Cmd2
+else
+ Cmd3
+fi 
+
+Cmd1 && { Cmd2 ; Cmd3 ; } || Cmd4
+----------------------------------
+if Cmd1
+then
+ Cmd2
+ Cmd3
+else
+ Cmd4
+fi 
+
+----------------------------
+#DOCKER INSTALLED OR NOT
+#!/bin/bash
+
+if which docker &> /dev/null
+then
+ echo "Docker is installed on this host"
+ echo "The docker versio is $(docker -v)"
+fi
+
+OR
+
+which docker &> /dev/null
+if [[ $? -eq 0 ]]
+then
+ echo "Docker is installed on this host"
+ echo "The docker versio is $(docker -v)"
+fi
+-----------------------------------
+#ROOT USER OR NOT
+#!/bin/bash
+
+if [[ $(id -u) -eq 0 ]]
+then
+ echo "You are a root"
+else
+ echo "You are not a root"
+
+--------------------------------
+
+#!/bin/bash
+
+sudo -v &> /dev/null
+
+if [[ $? -eq 0 ]]
+then
+ echo "The user $(id -un) is having sudo privilages on this $(hostname -f)"
+else
+ echo "The user $(id -un) is NOT having sudo privilages on this $(hostname -f)"
+
+----------------------------------------------------------------
+Write the script to start NGINX Service, if not installed, then install
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
