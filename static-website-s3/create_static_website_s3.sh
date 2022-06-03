@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash
 
 ROOT_UID=0     
 E_NOTROOT=100
