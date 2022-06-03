@@ -1,0 +1,75 @@
+{
+  "pipeline": {
+    "name": "pl.www.gulraeez.com",
+    "roleArn": "arn:aws:iam::160225963723:role/AWSCodePipelineServiceRole-us-east-1-www-gulraeez-com",
+    "artifactStore": {
+      "type": "S3",
+      "location": "codepipeline-us-east-1-671938210606"
+    },
+    "stages": [
+      {
+        "name": "Source",
+        "actions": [
+          {
+            "name": "Source",
+            "actionTypeId": {
+              "category": "Source",
+              "owner": "AWS",
+              "provider": "CodeStarSourceConnection",
+              "version": "1"
+            },
+            "runOrder": 1,
+            "configuration": {
+              "BranchName": "main",
+              "ConnectionArn": "arn:aws:codestar-connections:us-east-1:160225963723:connection/3c4685ea-9e99-4e7a-99e2-9eff7799a9cb",
+              "FullRepositoryId": "gulraeezgulshan/gh.www.gulraeez.com",
+              "OutputArtifactFormat": "CODE_ZIP"
+            },
+            "outputArtifacts": [
+              {
+                "name": "SourceArtifact"
+              }
+            ],
+            "inputArtifacts": [],
+            "region": "us-east-1",
+            "namespace": "SourceVariables"
+          }
+        ]
+      },
+      {
+        "name": "Deploy",
+        "actions": [
+          {
+            "name": "Deploy",
+            "actionTypeId": {
+              "category": "Deploy",
+              "owner": "AWS",
+              "provider": "S3",
+              "version": "1"
+            },
+            "runOrder": 1,
+            "configuration": {
+              "BucketName": "s3.www.gulraeez.com",
+              "Extract": "true"
+            },
+            "outputArtifacts": [],
+            "inputArtifacts": [
+              {
+                "name": "SourceArtifact"
+              }
+            ],
+            "region": "us-east-1",
+            "namespace": "DeployVariables"
+          }
+        ]
+      }
+    ],
+    "version": 1
+  },
+  "tags": [
+    {
+      "key": "Project",
+      "value": "ProjectA"
+    }
+  ]
+}

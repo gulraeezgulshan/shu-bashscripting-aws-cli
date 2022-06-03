@@ -1,0 +1,43 @@
+{
+    "Comment": "optional comment about the changes in this change batch request",
+    "Changes": [
+      {
+        "Action": "CREATE",
+        "ResourceRecordSet": {
+          "Name": "Domain Name",
+          "Type": "A",
+          "AliasTarget": {
+            "HostedZoneId": "HostedZoneId of CloudFront",
+            "DNSName": "DNS Name of CloudFront",
+            "EvaluateTargetHealth": false
+          }
+        }
+      },
+      {
+        "Action": "CREATE",
+        "ResourceRecordSet": {
+          "Name": "Sub Domain Name",
+          "Type": "CNAME",
+          "TTL": 300,
+          "ResourceRecords": [
+            {
+              "Value": "Value to Route"
+            }
+          ]
+        }
+      },
+      {
+        "Action": "CREATE",
+        "ResourceRecordSet": {
+          "Name": "Certificate CNAME Record Name",
+          "Type": "CNAME",
+          "TTL": 300,
+          "ResourceRecords": [
+            {
+              "Value": "Certificate CNAME Record Value"
+            }
+          ]
+        }
+      }
+    ]
+  }
